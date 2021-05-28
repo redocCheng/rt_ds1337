@@ -36,7 +36,7 @@ static rt_err_t write_reg(struct rt_i2c_bus_device *bus, rt_uint8_t reg, rt_uint
     struct rt_i2c_msg msgs;
 
     buf[0] = reg; 
-	rt_memcpy(buf+1, data, len);
+    rt_memcpy(buf+1, data, len);
 	
     msgs.addr = DS1337_ADDR;
     msgs.flags = RT_I2C_WR;
@@ -74,78 +74,78 @@ static rt_err_t read_regs(struct rt_i2c_bus_device *bus, rt_uint8_t reg, rt_uint
 
 static uint8_t dec2bcd(uint8_t dec)
 {
-	return (dec + (dec/10)*6);
+    return (dec + (dec/10)*6);
 }
 
 static uint8_t bcd2dec(uint8_t bcd)
 {
-	return (bcd - (bcd >> 4) * 6);
+    return (bcd - (bcd >> 4) * 6);
 }
 
 void ds1337_write(time_t *time)
 {
-	struct tm *p_tm;
+    struct tm *p_tm;
     struct tm tm_new;
-	
-	if (!initialized)
+
+    if (!initialized)
     {
-		i2c_ds1337_init();
-	}
-	
+        i2c_ds1337_init();
+    }
+
     rt_enter_critical();
     p_tm = localtime(time);
     memcpy(&tm_new, p_tm, sizeof(struct tm));
     rt_exit_critical();
-	
-	time_buf[0] = dec2bcd(tm_new.tm_sec) & ds1337_wr_format[0];
-	time_buf[1] = dec2bcd(tm_new.tm_min) & ds1337_wr_format[1];
-	time_buf[2] = dec2bcd(tm_new.tm_hour) & ds1337_wr_format[2];
-	time_buf[4] = dec2bcd(tm_new.tm_mday) & ds1337_wr_format[4];
-	time_buf[5] = dec2bcd(tm_new.tm_mon) & ds1337_wr_format[5];
-	time_buf[6] = dec2bcd(tm_new.tm_year) & ds1337_wr_format[6];
-	
-	write_reg(i2c_bus, ds1337_wr_addr[0], time_buf, 7);
+
+    time_buf[0] = dec2bcd(tm_new.tm_sec) & ds1337_wr_format[0];
+    time_buf[1] = dec2bcd(tm_new.tm_min) & ds1337_wr_format[1];
+    time_buf[2] = dec2bcd(tm_new.tm_hour) & ds1337_wr_format[2];
+    time_buf[4] = dec2bcd(tm_new.tm_mday) & ds1337_wr_format[4];
+    time_buf[5] = dec2bcd(tm_new.tm_mon) & ds1337_wr_format[5];
+    time_buf[6] = dec2bcd(tm_new.tm_year) & ds1337_wr_format[6];
+
+    write_reg(i2c_bus, ds1337_wr_addr[0], time_buf, 7);
 }
 
 time_t ds1337_read(void)
 {
-	time_t time;
-	struct tm tm_new;
-	
-	if (!initialized)
+    time_t time;
+    struct tm tm_new;
+
+    if (!initialized)
     {
-		i2c_ds1337_init();
-	}
-	
-	write_reg(i2c_bus, ds1337_wr_addr[0], RT_NULL, 0);
-	read_regs(i2c_bus, ds1337_wr_addr[0], time_buf, 7);
-	
-	tm_new.tm_sec  = bcd2dec(time_buf[0] & ds1337_wr_format[0]);
-	tm_new.tm_min  = bcd2dec(time_buf[1] & ds1337_wr_format[1]);
-	tm_new.tm_hour = bcd2dec(time_buf[2] & ds1337_wr_format[2]);
-	tm_new.tm_mday = bcd2dec(time_buf[4] & ds1337_wr_format[4]);
-	tm_new.tm_mon  = bcd2dec(time_buf[5] & ds1337_wr_format[5]);
-	tm_new.tm_year = bcd2dec(time_buf[6] & ds1337_wr_format[6]);
-	
-	time = mktime(&tm_new);
-	
-	return time;
+        i2c_ds1337_init();
+    }
+
+    write_reg(i2c_bus, ds1337_wr_addr[0], RT_NULL, 0);
+    read_regs(i2c_bus, ds1337_wr_addr[0], time_buf, 7);
+
+    tm_new.tm_sec  = bcd2dec(time_buf[0] & ds1337_wr_format[0]);
+    tm_new.tm_min  = bcd2dec(time_buf[1] & ds1337_wr_format[1]);
+    tm_new.tm_hour = bcd2dec(time_buf[2] & ds1337_wr_format[2]);
+    tm_new.tm_mday = bcd2dec(time_buf[4] & ds1337_wr_format[4]);
+    tm_new.tm_mon  = bcd2dec(time_buf[5] & ds1337_wr_format[5]);
+    tm_new.tm_year = bcd2dec(time_buf[6] & ds1337_wr_format[6]);
+
+    time = mktime(&tm_new);
+
+    return time;
 }
 
 int i2c_ds1337_init(void)
 {
-	rt_err_t result = RT_EOK;
-	
-	i2c_bus = (struct rt_i2c_bus_device *)rt_device_find(DS1337_I2C_BUS_NAME);
-	if (i2c_bus == RT_NULL)
-    {
-		result = -RT_ERROR;
-		LOG_E("can't find %s device!\n",DS1337_I2C_BUS_NAME);
-    }
-	else
-	{
-		initialized = RT_TRUE;
-	}
+    rt_err_t result = RT_EOK;
 
-	return result;
+    i2c_bus = (struct rt_i2c_bus_device *)rt_device_find(DS1337_I2C_BUS_NAME);
+    if (i2c_bus == RT_NULL)
+    {
+        result = -RT_ERROR;
+        LOG_E("can't find %s device!\n",DS1337_I2C_BUS_NAME);
+    }
+    else
+    {
+        initialized = RT_TRUE;
+    }
+
+    return result;
 }
