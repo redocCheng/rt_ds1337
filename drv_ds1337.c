@@ -17,12 +17,12 @@
 #define LOG_TAG "drv.ds1337"
 #include <drv_log.h>
 
-#define DS1337_I2C_BUS_NAME      "i2c1"  		
+#define DS1337_I2C_BUS_NAME             "i2c1"  		
 #define DS1337_ADDR      		 0x68    	
 
 /*******************************         sec min  hour week  DD   MM   YY  */	
-const rt_uint8_t ds1337_wr_addr[7]   = {0x00,0x01,0x02,0x03,0x04,0x05,0x06};
-const rt_uint8_t ds1337_wr_format[7] = {0x7f,0x7f,0x3f,0x07,0x3f,0x1f,0xff};
+const rt_uint8_t ds1337_wr_addr[7]   = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06};
+const rt_uint8_t ds1337_wr_format[7] = {0x7f, 0x7f, 0x3f, 0x07, 0x3f, 0x1f, 0xff};
 
 /*******************************  sec min  hour week  DD   MM   YY  */	
 static rt_uint8_t time_buf[7] = {0};
